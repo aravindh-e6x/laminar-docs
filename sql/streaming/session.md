@@ -3,38 +3,30 @@ title: SESSION Window
 description: Dynamic gap-based windows for user activity and session analysis
 ---
 
+# SESSION Window
 
-## Description
+### Description
 
 The `SESSION` function creates dynamic, variable-size windows based on gaps of inactivity in the event stream. Unlike fixed-size windows (TUMBLE, HOP), session windows grow with activity and close after a specified period of inactivity. This is ideal for analyzing user sessions, transaction sequences, and any activity-based patterns.
 
-## Syntax
+### Syntax
 
 ```sql
 SESSION(gap_duration)
 ```
 
-### Parameters
-- **gap_duration** (INTERVAL): The maximum time gap between events before a new session starts
+#### Parameters
 
-### Return Value
-- **Type**: Window descriptor with `start` and `end` timestamps
-- **Description**: A dynamic window that expands with activity and closes after the gap duration
+* **gap\_duration** (INTERVAL): The maximum time gap between events before a new session starts
 
-## How Session Windows Work
+#### Return Value
 
-Session windows group events that are temporally close, creating a new window when the gap exceeds the threshold:
+* **Type**: Window descriptor with `start` and `end` timestamps
+* **Description**: A dynamic window that expands with activity and closes after the gap duration
 
-![Session Windows](/img/streaming/session-window.svg)
+### Example
 
-Each session window:
-- Starts with the first event
-- Expands as new events arrive within the gap duration
-- Closes when no event arrives for the gap duration
-
-## Example
-
-### Sample Streaming Data
+#### Sample Streaming Data
 
 ```sql
 CREATE TABLE user_activities (
@@ -52,7 +44,7 @@ CREATE TABLE user_activities (
 );
 ```
 
-### Basic Session Window Query
+#### Basic Session Window Query
 
 ```sql
 -- User sessions with 30-minute inactivity timeout
@@ -68,17 +60,18 @@ FROM user_activities
 GROUP BY user_id, session_window;
 ```
 
-### Result Stream (Continuous Output)
-| user_id | page_views | unique_pages | total_duration | session_start       | session_end         |
-|---------|------------|--------------|----------------|-------------------|-------------------|
-| 1001    | 15         | 8            | 425            | 2024-03-15 10:00:00 | 2024-03-15 10:28:45 |
-| 1002    | 7          | 5            | 180            | 2024-03-15 10:05:30 | 2024-03-15 10:15:20 |
-| 1001    | 23         | 12           | 680            | 2024-03-15 11:10:00 | 2024-03-15 11:45:30 |
-| 1003    | 42         | 18           | 1250           | 2024-03-15 10:00:00 | 2024-03-15 10:58:00 |
+#### Result Stream (Continuous Output)
 
-## Common Use Cases
+| user\_id | page\_views | unique\_pages | total\_duration | session\_start      | session\_end        |
+| -------- | ----------- | ------------- | --------------- | ------------------- | ------------------- |
+| 1001     | 15          | 8             | 425             | 2024-03-15 10:00:00 | 2024-03-15 10:28:45 |
+| 1002     | 7           | 5             | 180             | 2024-03-15 10:05:30 | 2024-03-15 10:15:20 |
+| 1001     | 23          | 12            | 680             | 2024-03-15 11:10:00 | 2024-03-15 11:45:30 |
+| 1003     | 42          | 18            | 1250            | 2024-03-15 10:00:00 | 2024-03-15 10:58:00 |
 
-### 1. User Session Analytics
+### Common Use Cases
+
+#### 1. User Session Analytics
 
 ```sql
 -- Comprehensive user session analysis
@@ -117,7 +110,7 @@ SELECT
 FROM user_sessions;
 ```
 
-### 2. Transaction Sequence Analysis
+#### 2. Transaction Sequence Analysis
 
 ```sql
 -- Group related transactions into sessions
@@ -149,7 +142,7 @@ GROUP BY user_id, shopping_session
 HAVING COUNT(*) >= 2;  -- Multi-transaction sessions only
 ```
 
-### 3. IoT Device Activity Monitoring
+#### 3. IoT Device Activity Monitoring
 
 ```sql
 -- Device online/offline sessions
@@ -181,7 +174,7 @@ WHERE status = 'ACTIVE'
 GROUP BY device_id, device_session;
 ```
 
-### 4. Customer Support Chat Sessions
+#### 4. Customer Support Chat Sessions
 
 ```sql
 -- Support conversation sessions
@@ -234,7 +227,7 @@ SELECT
 FROM chat_sessions;
 ```
 
-### 5. Gaming Session Analysis
+#### 5. Gaming Session Analysis
 
 ```sql
 -- Player gaming sessions
@@ -266,9 +259,9 @@ FROM game_events
 GROUP BY player_id, gaming_session;
 ```
 
-## Advanced Patterns
+### Advanced Patterns
 
-### Session Metrics with User Journey
+#### Session Metrics with User Journey
 
 ```sql
 -- Track user journey through conversion funnel
@@ -301,7 +294,7 @@ FROM session_events
 GROUP BY user_id, session;
 ```
 
-### Multi-Device Session Tracking
+#### Multi-Device Session Tracking
 
 ```sql
 -- Track user sessions across devices
@@ -331,7 +324,7 @@ GROUP BY user_id, unified_session
 HAVING COUNT(DISTINCT device_id) > 1;  -- Multi-device sessions
 ```
 
-### Session-Based Anomaly Detection
+#### Session-Based Anomaly Detection
 
 ```sql
 -- Detect unusual session patterns
@@ -372,9 +365,9 @@ FROM current_sessions c
 LEFT JOIN normal_sessions n ON c.user_id = n.user_id;
 ```
 
-## Session Window Characteristics
+### Session Window Characteristics
 
-### Dynamic Window Boundaries
+#### Dynamic Window Boundaries
 
 ```sql
 -- Sessions expand with activity
@@ -383,7 +376,7 @@ Session 1: [10:00 - 10:23] (includes first 3 events + gap)
 Session 2: [10:20 - 10:37] (includes last 2 events + gap)
 ```
 
-### Handling Concurrent Sessions
+#### Handling Concurrent Sessions
 
 ```sql
 -- Different session windows for different keys
@@ -397,60 +390,53 @@ GROUP BY user_id, device_id, session;
 -- Each (user_id, device_id) pair has independent sessions
 ```
 
-## Performance Considerations
+### Performance Considerations
 
-1. **State Management**: 
-   - Open sessions keep state until gap timeout
-   - Memory usage proportional to active sessions
-
+1. **State Management**:
+   * Open sessions keep state until gap timeout
+   * Memory usage proportional to active sessions
 2. **Watermark Impact**:
-   - Sessions close based on watermark + gap duration
-   - Late events may create new sessions
-
+   * Sessions close based on watermark + gap duration
+   * Late events may create new sessions
 3. **Gap Duration Selection**:
-   - Short gaps: More sessions, quicker results
-   - Long gaps: Fewer sessions, more memory usage
-
+   * Short gaps: More sessions, quicker results
+   * Long gaps: Fewer sessions, more memory usage
 4. **Key Cardinality**:
-   - High cardinality (many users) = more concurrent sessions
-   - Consider state backend capacity
+   * High cardinality (many users) = more concurrent sessions
+   * Consider state backend capacity
 
-## Best Practices
+### Best Practices
 
 1. **Choose Appropriate Gap Duration**:
-   - Analyze typical user behavior patterns
-   - Consider business requirements for session definition
-
+   * Analyze typical user behavior patterns
+   * Consider business requirements for session definition
 2. **Handle Session Boundaries**:
-   - Account for sessions spanning query boundaries
-   - Use watermarks appropriately
-
+   * Account for sessions spanning query boundaries
+   * Use watermarks appropriately
 3. **Optimize for Memory**:
-   - Set reasonable gap durations
-   - Consider session TTL for long-running queries
-
+   * Set reasonable gap durations
+   * Consider session TTL for long-running queries
 4. **Monitor Session Metrics**:
-   - Track average session duration
-   - Monitor number of concurrent sessions
-   - Watch for unusually long sessions
-
+   * Track average session duration
+   * Monitor number of concurrent sessions
+   * Watch for unusually long sessions
 5. **Late Data Strategy**:
-   - Define clear policies for late-arriving events
-   - Consider impact on session boundaries
+   * Define clear policies for late-arriving events
+   * Consider impact on session boundaries
 
-## Comparison with Fixed Windows
+### Comparison with Fixed Windows
 
-| Feature | SESSION | TUMBLE | HOP |
-|---------|---------|--------|-----|
-| Window Size | Variable | Fixed | Fixed |
-| Based On | Activity gaps | Time intervals | Sliding intervals |
-| Use Case | User sessions | Periodic reports | Moving averages |
-| Boundaries | Dynamic | Predetermined | Predetermined |
-| Memory Usage | Variable | Predictable | Predictable |
-| Event Assignment | Based on gaps | Based on time | Multiple windows |
+| Feature          | SESSION       | TUMBLE           | HOP               |
+| ---------------- | ------------- | ---------------- | ----------------- |
+| Window Size      | Variable      | Fixed            | Fixed             |
+| Based On         | Activity gaps | Time intervals   | Sliding intervals |
+| Use Case         | User sessions | Periodic reports | Moving averages   |
+| Boundaries       | Dynamic       | Predetermined    | Predetermined     |
+| Memory Usage     | Variable      | Predictable      | Predictable       |
+| Event Assignment | Based on gaps | Based on time    | Multiple windows  |
 
-## Related Functions
-- [TUMBLE](./tumble.md) - Fixed-size non-overlapping windows
-- [HOP](./hop.md) - Fixed-size overlapping windows
-- [Watermarks](./watermarks.md) - Handling event time
-- [Windowed Aggregations](./windowed-aggregations.md) - Aggregation patterns
+### Related Functions
+
+* [TUMBLE](tumble.md) - Fixed-size non-overlapping windows
+* [HOP](hop.md) - Fixed-size overlapping windows
+* [Windowed Aggregations](windowed-aggregations.md) - Aggregation patterns

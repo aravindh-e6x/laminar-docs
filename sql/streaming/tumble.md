@@ -3,35 +3,31 @@ title: TUMBLE Window
 description: Fixed-size, non-overlapping time windows for streaming aggregations
 ---
 
+# TUMBLE Window
 
-## Description
+### Description
 
 The `TUMBLE` function creates fixed-size, non-overlapping (tumbling) time windows over streaming data. Each event belongs to exactly one window, making it ideal for creating time-based buckets for aggregations like hourly reports, daily summaries, or fixed-interval metrics.
 
-## Syntax
+### Syntax
 
 ```sql
 TUMBLE(window_size)
 ```
 
-### Parameters
-- **window_size** (INTERVAL): The size of each tumbling window (e.g., `INTERVAL '1 hour'`, `INTERVAL '5 minutes'`)
+#### Parameters
 
-### Return Value
-- **Type**: Window descriptor with `start` and `end` timestamps
-- **Description**: A window object that can be used in GROUP BY clauses and accessed for window boundaries
+* **window\_size** (INTERVAL): The size of each tumbling window (e.g., `INTERVAL '1 hour'`, `INTERVAL '5 minutes'`)
 
-## How Tumbling Windows Work
+#### Return Value
 
-Tumbling windows divide the time axis into fixed-size, consecutive, non-overlapping intervals:
+* **Type**: Window descriptor with `start` and `end` timestamps
+* **Description**: A window object that can be used in GROUP BY clauses and accessed for window boundaries
 
-![Tumbling Windows](/img/streaming/tumble-window.svg)
+### Example
 
-Each event is assigned to exactly one window based on its timestamp.
+#### Sample Streaming Data
 
-## Example
-
-### Sample Streaming Data
 Consider a continuous stream of transaction events:
 
 ```sql
@@ -49,7 +45,7 @@ CREATE TABLE transactions (
 );
 ```
 
-### Basic Tumbling Window Query
+#### Basic Tumbling Window Query
 
 ```sql
 -- 5-minute tumbling windows for transaction summaries
@@ -64,16 +60,17 @@ FROM transactions
 GROUP BY window;
 ```
 
-### Result Stream (Continuous Output)
-| transaction_count | total_amount | avg_amount | min_amount | max_amount | window.start        | window.end          |
-|------------------|-------------|------------|------------|------------|-------------------|-------------------|
-| 145              | 28450.00    | 196.21     | 5.99       | 1250.00    | 2024-03-15 10:00:00 | 2024-03-15 10:05:00 |
-| 162              | 31200.50    | 192.60     | 8.50       | 2100.00    | 2024-03-15 10:05:00 | 2024-03-15 10:10:00 |
-| 138              | 26800.75    | 194.21     | 12.00      | 1850.00    | 2024-03-15 10:10:00 | 2024-03-15 10:15:00 |
+#### Result Stream (Continuous Output)
 
-## Common Use Cases
+| transaction\_count | total\_amount | avg\_amount | min\_amount | max\_amount | window.start        | window.end          |
+| ------------------ | ------------- | ----------- | ----------- | ----------- | ------------------- | ------------------- |
+| 145                | 28450.00      | 196.21      | 5.99        | 1250.00     | 2024-03-15 10:00:00 | 2024-03-15 10:05:00 |
+| 162                | 31200.50      | 192.60      | 8.50        | 2100.00     | 2024-03-15 10:05:00 | 2024-03-15 10:10:00 |
+| 138                | 26800.75      | 194.21      | 12.00       | 1850.00     | 2024-03-15 10:10:00 | 2024-03-15 10:15:00 |
 
-### 1. Hourly Metrics Dashboard
+### Common Use Cases
+
+#### 1. Hourly Metrics Dashboard
 
 ```sql
 -- Hourly business metrics
@@ -88,7 +85,7 @@ FROM transactions
 GROUP BY category, hour_window;
 ```
 
-### 2. Real-Time Error Monitoring
+#### 2. Real-Time Error Monitoring
 
 ```sql
 -- 1-minute error rate monitoring
@@ -115,7 +112,7 @@ GROUP BY service_name, window
 HAVING COUNT(*) FILTER (WHERE log_level = 'ERROR') > 10;  -- Alert threshold
 ```
 
-### 3. IoT Sensor Aggregations
+#### 3. IoT Sensor Aggregations
 
 ```sql
 -- 10-second sensor reading aggregations
@@ -144,7 +141,7 @@ FROM sensor_readings
 GROUP BY location, window;
 ```
 
-### 4. Traffic Analysis
+#### 4. Traffic Analysis
 
 ```sql
 -- 15-minute website traffic analysis
@@ -160,7 +157,7 @@ GROUP BY page_category, window
 ORDER BY window.start, page_views DESC;
 ```
 
-### 5. Financial Market Data
+#### 5. Financial Market Data
 
 ```sql
 -- 1-minute OHLC (candlestick) data
@@ -177,7 +174,7 @@ FROM trades
 GROUP BY symbol, window;
 ```
 
-## Window Boundaries and Alignment
+### Window Boundaries and Alignment
 
 Tumbling windows are aligned to epoch time (1970-01-01 00:00:00 UTC):
 
@@ -199,7 +196,7 @@ FROM events
 GROUP BY window;
 ```
 
-## Accessing Window Properties
+### Accessing Window Properties
 
 ```sql
 -- Access window start and end times
@@ -213,9 +210,9 @@ FROM events
 GROUP BY window;
 ```
 
-## Combining with Other Clauses
+### Combining with Other Clauses
 
-### With WHERE Filters
+#### With WHERE Filters
 
 ```sql
 -- Tumbling windows with filtering
@@ -228,7 +225,7 @@ WHERE amount > 100
 GROUP BY category, window;
 ```
 
-### With HAVING Conditions
+#### With HAVING Conditions
 
 ```sql
 -- Only output windows meeting criteria
@@ -242,7 +239,7 @@ GROUP BY store_id, window
 HAVING SUM(amount) > 10000;  -- High-volume windows only
 ```
 
-### With JOIN Operations
+#### With JOIN Operations
 
 ```sql
 -- Join aggregated windows
@@ -274,7 +271,7 @@ JOIN hourly_inventory i
 WHERE s.units_sold > i.avg_stock * 0.5;  -- High demand alert
 ```
 
-## Late Data Handling
+### Late Data Handling
 
 Events arriving after the watermark are handled based on the configured strategy:
 
@@ -297,14 +294,14 @@ FROM events
 GROUP BY window;
 ```
 
-## Performance Considerations
+### Performance Considerations
 
 1. **Window Size**: Smaller windows require more frequent state updates
 2. **State Management**: Each window maintains aggregate state until watermark passes
 3. **Output Frequency**: Results are emitted when watermark crosses window boundary
 4. **Memory Usage**: Proportional to number of keys × number of open windows
 
-## Best Practices
+### Best Practices
 
 1. **Choose Appropriate Window Size**: Balance between granularity and performance
 2. **Set Reasonable Watermarks**: Allow for typical late data without excessive delay
@@ -312,16 +309,16 @@ GROUP BY window;
 4. **Monitor State Size**: Track memory usage for high-cardinality groupings
 5. **Consider Downstream Systems**: Ensure consumers can handle output rate
 
-## Comparison with Other Windows
+### Comparison with Other Windows
 
-| Window Type | Overlapping | Size | Use Case |
-|------------|-------------|------|----------|
-| **TUMBLE** | No | Fixed | Period-based reporting |
-| **HOP** | Yes | Fixed | Moving averages |
-| **SESSION** | No | Variable | User activity analysis |
+| Window Type | Overlapping | Size     | Use Case               |
+| ----------- | ----------- | -------- | ---------------------- |
+| **TUMBLE**  | No          | Fixed    | Period-based reporting |
+| **HOP**     | Yes         | Fixed    | Moving averages        |
+| **SESSION** | No          | Variable | User activity analysis |
 
-## Related Functions
-- [HOP](./hop.md) - Sliding windows with overlap
-- [SESSION](./session.md) - Session-based windows
-- [Watermarks](./watermarks.md) - Handling event time and late data
-- [Windowed Aggregations](./windowed-aggregations.md) - Aggregation patterns
+### Related Functions
+
+* [HOP](hop.md) - Sliding windows with overlap
+* [SESSION](session.md) - Session-based windows
+* [Windowed Aggregations](windowed-aggregations.md) - Aggregation patterns

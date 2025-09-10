@@ -7,10 +7,6 @@ title: Architecture
 
 Laminar is built on a distributed, scalable architecture designed for high-throughput, low-latency stream processing. This guide provides an in-depth look at the system architecture and its components.
 
-### System Overview
-
-![Laminar Distributed System Architecture](img/distributed-system-architecture.svg)
-
 ### Core Components
 
 #### Control Plane
@@ -116,12 +112,6 @@ Collects and stores metrics:
 * Job metrics
 * Operator metrics
 * Custom metrics
-
-### Data Flow
-
-#### Pipeline Execution Flow
-
-![Pipeline Execution Flow](img/pipeline-execution-flow.svg)
 
 #### Fault Tolerance
 

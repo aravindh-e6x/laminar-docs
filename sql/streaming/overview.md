@@ -3,27 +3,23 @@ title: Streaming SQL Overview
 description: Introduction to streaming SQL concepts and capabilities in Laminar
 ---
 
+# Streaming SQL Overview
 
-## Introduction
+### Introduction
 
 Laminar extends standard SQL with powerful streaming capabilities, enabling real-time data processing and analytics. Unlike traditional batch SQL that operates on static datasets, streaming SQL processes continuous data flows, providing immediate insights as data arrives.
 
-## Key Concepts
+### Key Concepts
 
-### Streams vs Tables
+* **Streams**: Unbounded sequences of events that continuously flow through the system
+* **Tables**: Materialized views of streams at specific points in time
 
-In streaming SQL, data exists in two fundamental forms:
-
-![Stream-Table Duality](/img/streaming/stream-table-duality.svg)
-
-- **Streams**: Unbounded sequences of events that continuously flow through the system
-- **Tables**: Materialized views of streams at specific points in time
-
-### Time Semantics
+#### Time Semantics
 
 Streaming SQL operates with two distinct notions of time:
 
-#### Event Time
+**Event Time**
+
 The time when an event actually occurred in the real world, embedded within the event data itself. This is the most accurate representation for analytics.
 
 ```sql
@@ -37,10 +33,11 @@ CREATE TABLE events (
 );
 ```
 
-#### Processing Time
+**Processing Time**
+
 The time when an event is processed by the system. While simpler to implement, it can lead to non-deterministic results.
 
-### Watermarks
+#### Watermarks
 
 Watermarks are timestamps that indicate the completeness of data up to a certain point in event time. They help the system determine when to emit results and handle late-arriving data.
 
@@ -56,17 +53,15 @@ CREATE TABLE sensor_data (
 );
 ```
 
-## Streaming SQL Capabilities
+### Streaming SQL Capabilities
 
-### 1. Time-Based Windows
+#### 1. Time-Based Windows
 
 Laminar supports three types of time windows for grouping streaming data:
 
-![Window Types Comparison](/img/streaming/window-comparison.svg)
-
-- **Tumbling Windows**: Fixed-size, non-overlapping windows
-- **Hopping Windows**: Fixed-size, overlapping windows  
-- **Session Windows**: Dynamic windows based on activity gaps
+* **Tumbling Windows**: Fixed-size, non-overlapping windows
+* **Hopping Windows**: Fixed-size, overlapping windows
+* **Session Windows**: Dynamic windows based on activity gaps
 
 ```sql
 -- Tumbling window: 1-minute aggregations
@@ -92,7 +87,7 @@ FROM user_events
 GROUP BY user_id, session;
 ```
 
-### 2. Continuous Queries
+#### 2. Continuous Queries
 
 Streaming queries run continuously, producing results as new data arrives:
 
@@ -109,7 +104,7 @@ SELECT
 FROM trades;
 ```
 
-### 3. Stream-Stream Joins
+#### 3. Stream-Stream Joins
 
 Join multiple data streams within time windows:
 
@@ -126,7 +121,7 @@ JOIN payments p
                         AND p.payment_time + INTERVAL '10 minutes';
 ```
 
-### 4. Change Data Capture (CDC)
+#### 4. Change Data Capture (CDC)
 
 Process database change events in real-time:
 
@@ -151,9 +146,10 @@ SELECT
 FROM users_cdc;
 ```
 
-## Stream Processing Patterns
+### Stream Processing Patterns
 
-### Pattern Detection
+#### Pattern Detection
+
 Identify sequences of events that match specific patterns:
 
 ```sql
@@ -167,7 +163,8 @@ GROUP BY user_id, SESSION(INTERVAL '5 minutes')
 HAVING COUNT(*) FILTER (WHERE status = 'failed') >= 3;
 ```
 
-### Real-Time Aggregations
+#### Real-Time Aggregations
+
 Compute metrics continuously as data flows:
 
 ```sql
@@ -182,7 +179,8 @@ FROM sales
 GROUP BY product_category, hour;
 ```
 
-### Deduplication
+#### Deduplication
+
 Remove duplicate events within time windows:
 
 ```sql
@@ -199,27 +197,27 @@ WITH deduped AS (
 SELECT * FROM deduped WHERE rn = 1;
 ```
 
-## State Management
+### State Management
 
 Streaming queries maintain state to compute results over time. Laminar provides:
 
-- **Automatic State Management**: State is managed transparently
-- **Checkpointing**: Periodic state snapshots for fault tolerance
-- **TTL Configuration**: Automatic cleanup of old state
+* **Automatic State Management**: State is managed transparently
+* **Checkpointing**: Periodic state snapshots for fault tolerance
+* **TTL Configuration**: Automatic cleanup of old state
 
 ```sql
 -- Configure state TTL for updating streams
 SET updating_ttl = INTERVAL '1 hour';
 ```
 
-## Delivery Guarantees
+### Delivery Guarantees
 
 Laminar supports different delivery semantics:
 
-- **At-least-once**: Messages may be processed multiple times
-- **Exactly-once**: Each message is processed exactly once (with transactional sources/sinks)
+* **At-least-once**: Messages may be processed multiple times
+* **Exactly-once**: Each message is processed exactly once (with transactional sources/sinks)
 
-## Best Practices
+### Best Practices
 
 1. **Use Event Time**: Prefer event time over processing time for deterministic results
 2. **Set Appropriate Watermarks**: Balance between latency and completeness
@@ -227,62 +225,8 @@ Laminar supports different delivery semantics:
 4. **Optimize Joins**: Use time-bounded joins to limit state retention
 5. **Monitor Memory Usage**: Track state size and memory consumption
 
-## Next Steps
+### Next Steps
 
-- Learn about [Window Functions](./window-functions.md) for time-based aggregations
-- Understand [Watermarks](./watermarks.md) for handling out-of-order data
-- Explore [Streaming Joins](./streaming-joins.md) for correlating multiple streams
-- Read about [CDC Processing](./cdc-processing.md) for database synchronization
-
-## Example: Real-Time Analytics Pipeline
-
-![Streaming Pipeline](/img/streaming/streaming-pipeline.svg)
-
-```sql
--- Source: Raw clickstream data
-CREATE TABLE clickstream (
-    user_id BIGINT,
-    session_id VARCHAR,
-    page_url VARCHAR,
-    timestamp TIMESTAMP,
-    WATERMARK FOR timestamp AS (timestamp - INTERVAL '10 seconds')
-) WITH (
-    connector = 'kafka',
-    topic = 'clickstream',
-    format = 'json'
-);
-
--- Processing: Session analysis
-CREATE VIEW user_sessions AS
-SELECT 
-    user_id,
-    session_id,
-    COUNT(*) as page_views,
-    COUNT(DISTINCT page_url) as unique_pages,
-    MIN(timestamp) as session_start,
-    MAX(timestamp) as session_end,
-    SESSION(INTERVAL '30 minutes') as session_window
-FROM clickstream
-GROUP BY user_id, session_id, session_window;
-
--- Sink: Materialized results
-CREATE TABLE session_metrics (
-    user_id BIGINT,
-    session_duration_seconds BIGINT,
-    page_views INT,
-    unique_pages INT
-) WITH (
-    connector = 'postgres',
-    table = 'session_metrics'
-);
-
-INSERT INTO session_metrics
-SELECT 
-    user_id,
-    EXTRACT(EPOCH FROM (session_end - session_start)) as session_duration_seconds,
-    page_views,
-    unique_pages
-FROM user_sessions;
-```
-
-This pipeline continuously processes clickstream data, analyzes user sessions in real-time, and stores aggregated metrics for dashboarding and further analysis.
+* Learn about [Window Functions](window-functions.md) for time-based aggregations
+* Explore [Streaming Joins](streaming-joins.md) for correlating multiple streams
+* Read about [CDC Processing](cdc-processing.md) for database synchronization

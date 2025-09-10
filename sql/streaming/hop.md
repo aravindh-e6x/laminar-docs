@@ -3,36 +3,31 @@ title: HOP Window
 description: Sliding windows with configurable overlap for streaming aggregations
 ---
 
+# HOP Window
 
-## Description
+### Description
 
 The `HOP` function creates fixed-size, overlapping (hopping/sliding) windows over streaming data. Unlike tumbling windows, hop windows can overlap, allowing events to belong to multiple windows. This is ideal for computing moving averages, trend detection, and smooth time-series analytics.
 
-## Syntax
+### Syntax
 
 ```sql
 HOP(hop_size, window_size)
 ```
 
-### Parameters
-- **hop_size** (INTERVAL): The distance between window starts (slide interval)
-- **window_size** (INTERVAL): The total size of each window
+#### Parameters
 
-### Return Value
-- **Type**: Window descriptor with `start` and `end` timestamps
-- **Description**: A window object that can be used in GROUP BY clauses and accessed for window boundaries
+* **hop\_size** (INTERVAL): The distance between window starts (slide interval)
+* **window\_size** (INTERVAL): The total size of each window
 
-## How Hopping Windows Work
+#### Return Value
 
-Hopping windows create overlapping time intervals where each window slides forward by the hop size:
+* **Type**: Window descriptor with `start` and `end` timestamps
+* **Description**: A window object that can be used in GROUP BY clauses and accessed for window boundaries
 
-![Hopping Windows](/img/streaming/hop-window.svg)
+### Example
 
-Each event can belong to multiple windows (window_size / hop_size windows).
-
-## Example
-
-### Sample Streaming Data
+#### Sample Streaming Data
 
 ```sql
 CREATE TABLE sensor_metrics (
@@ -49,7 +44,7 @@ CREATE TABLE sensor_metrics (
 );
 ```
 
-### Basic Hopping Window Query
+#### Basic Hopping Window Query
 
 ```sql
 -- 10-minute windows sliding every 2 minutes
@@ -64,17 +59,18 @@ FROM sensor_metrics
 GROUP BY window;
 ```
 
-### Result Stream (Continuous Output)
-| avg_temp | min_temp | max_temp | temp_stddev | reading_count | window.start        | window.end          |
-|----------|----------|----------|-------------|---------------|-------------------|-------------------|
-| 22.5     | 19.2     | 25.8     | 1.87        | 480          | 2024-03-15 10:00:00 | 2024-03-15 10:10:00 |
-| 22.8     | 19.5     | 26.2     | 1.92        | 485          | 2024-03-15 10:02:00 | 2024-03-15 10:12:00 |
-| 23.1     | 20.1     | 26.5     | 1.85        | 492          | 2024-03-15 10:04:00 | 2024-03-15 10:14:00 |
-| 23.3     | 20.4     | 26.8     | 1.79        | 488          | 2024-03-15 10:06:00 | 2024-03-15 10:16:00 |
+#### Result Stream (Continuous Output)
 
-## Common Use Cases
+| avg\_temp | min\_temp | max\_temp | temp\_stddev | reading\_count | window.start        | window.end          |
+| --------- | --------- | --------- | ------------ | -------------- | ------------------- | ------------------- |
+| 22.5      | 19.2      | 25.8      | 1.87         | 480            | 2024-03-15 10:00:00 | 2024-03-15 10:10:00 |
+| 22.8      | 19.5      | 26.2      | 1.92         | 485            | 2024-03-15 10:02:00 | 2024-03-15 10:12:00 |
+| 23.1      | 20.1      | 26.5      | 1.85         | 492            | 2024-03-15 10:04:00 | 2024-03-15 10:14:00 |
+| 23.3      | 20.4      | 26.8      | 1.79         | 488            | 2024-03-15 10:06:00 | 2024-03-15 10:16:00 |
 
-### 1. Moving Averages for Trading
+### Common Use Cases
+
+#### 1. Moving Averages for Trading
 
 ```sql
 -- 5-minute moving average, updated every minute
@@ -102,7 +98,7 @@ GROUP BY symbol, window
 ORDER BY window.start DESC, symbol;
 ```
 
-### 2. Trend Detection
+#### 2. Trend Detection
 
 ```sql
 -- Detect temperature trends with overlapping windows
@@ -138,7 +134,7 @@ FROM temperature_trends
 WHERE prev_avg IS NOT NULL;
 ```
 
-### 3. Smooth Real-Time Analytics
+#### 3. Smooth Real-Time Analytics
 
 ```sql
 -- Website traffic with smooth transitions
@@ -165,7 +161,7 @@ FROM page_views
 GROUP BY window;
 ```
 
-### 4. Anomaly Detection with Baseline
+#### 4. Anomaly Detection with Baseline
 
 ```sql
 -- Network traffic anomaly detection
@@ -221,7 +217,7 @@ JOIN baseline b
 WHERE b.stddev_bytes > 0;
 ```
 
-### 5. User Engagement Metrics
+#### 5. User Engagement Metrics
 
 ```sql
 -- Overlapping session windows for engagement analysis
@@ -254,7 +250,7 @@ GROUP BY user_id, window
 HAVING COUNT(*) > 5;  -- Active users only
 ```
 
-## Overlap Factor and Performance
+### Overlap Factor and Performance
 
 The overlap factor determines how many windows each event belongs to:
 
@@ -267,7 +263,7 @@ Examples:
 - HOP(10 min, 10 min) → Overlap Factor = 1 (equivalent to TUMBLE)
 ```
 
-### Performance Implications
+#### Performance Implications
 
 ```sql
 -- High overlap (more computation, smoother results)
@@ -285,9 +281,9 @@ FROM metrics
 GROUP BY window;
 ```
 
-## Advanced Patterns
+### Advanced Patterns
 
-### Multiple Hop Windows
+#### Multiple Hop Windows
 
 ```sql
 -- Different granularities for comprehensive monitoring
@@ -322,7 +318,7 @@ JOIN medium_term m ON s.window.start = m.window.start
 JOIN long_term l ON s.window.start = l.window.start;
 ```
 
-### Weighted Moving Averages
+#### Weighted Moving Averages
 
 ```sql
 -- More weight to recent data using multiple hop windows
@@ -347,7 +343,7 @@ FROM weighted_windows
 GROUP BY symbol, window;
 ```
 
-## Window Alignment
+### Window Alignment
 
 Hop windows align based on epoch time, with the hop size determining the start times:
 
@@ -361,42 +357,38 @@ HOP(INTERVAL '2 minutes', INTERVAL '10 minutes')
 -- Windows: [00:00-00:10], [00:02-00:12], [00:04-00:14], ...
 ```
 
-## Best Practices
+### Best Practices
 
-1. **Choose Appropriate Hop Size**: 
-   - Smaller hop → smoother transitions, more computation
-   - Larger hop → more discrete updates, less computation
-
+1. **Choose Appropriate Hop Size**:
+   * Smaller hop → smoother transitions, more computation
+   * Larger hop → more discrete updates, less computation
 2. **Consider Overlap Factor**:
-   - Factor 2-3: Good balance for most use cases
-   - Factor > 5: Only for critical smooth monitoring
-   - Factor 1: Use TUMBLE instead
-
+   * Factor 2-3: Good balance for most use cases
+   * Factor > 5: Only for critical smooth monitoring
+   * Factor 1: Use TUMBLE instead
 3. **Memory Management**:
-   - Each event stored in multiple windows
-   - Memory usage ≈ overlap_factor × data_size
-
+   * Each event stored in multiple windows
+   * Memory usage ≈ overlap\_factor × data\_size
 4. **Late Data Handling**:
-   - Set watermarks considering all overlapping windows
-   - Late data affects multiple window results
-
+   * Set watermarks considering all overlapping windows
+   * Late data affects multiple window results
 5. **Output Management**:
-   - Higher overlap means more frequent outputs
-   - Consider downstream system capacity
+   * Higher overlap means more frequent outputs
+   * Consider downstream system capacity
 
-## Comparison with Other Windows
+### Comparison with Other Windows
 
-| Aspect | TUMBLE | HOP | SESSION |
-|--------|--------|-----|---------|
-| Overlap | No | Yes | No |
-| Size | Fixed | Fixed | Variable |
-| Events per Window | Each in 1 | Each in multiple | Varies |
-| Use Case | Discrete buckets | Smooth analytics | Activity-based |
-| Computation | Low | Medium-High | Medium |
-| Output Frequency | Per window_size | Per hop_size | Per session end |
+| Aspect            | TUMBLE           | HOP              | SESSION         |
+| ----------------- | ---------------- | ---------------- | --------------- |
+| Overlap           | No               | Yes              | No              |
+| Size              | Fixed            | Fixed            | Variable        |
+| Events per Window | Each in 1        | Each in multiple | Varies          |
+| Use Case          | Discrete buckets | Smooth analytics | Activity-based  |
+| Computation       | Low              | Medium-High      | Medium          |
+| Output Frequency  | Per window\_size | Per hop\_size    | Per session end |
 
-## Related Functions
-- [TUMBLE](./tumble.md) - Non-overlapping fixed windows
-- [SESSION](./session.md) - Gap-based activity windows
-- [Watermarks](./watermarks.md) - Handling event time and late data
-- [Windowed Aggregations](./windowed-aggregations.md) - Aggregation patterns
+### Related Functions
+
+* [TUMBLE](tumble.md) - Non-overlapping fixed windows
+* [SESSION](session.md) - Gap-based activity windows
+* [Windowed Aggregations](windowed-aggregations.md) - Aggregation patterns
