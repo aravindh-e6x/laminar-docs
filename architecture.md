@@ -3,162 +3,184 @@ sidebar_position: 2
 title: Architecture
 ---
 
+# Architecture
+
 Laminar is built on a distributed, scalable architecture designed for high-throughput, low-latency stream processing. This guide provides an in-depth look at the system architecture and its components.
 
-## System Overview
+### System Overview
 
-![Laminar Distributed System Architecture](/img/distributed-system-architecture.svg)
+![Laminar Distributed System Architecture](img/distributed-system-architecture.svg)
 
-## Core Components
+### Core Components
 
-### Control Plane
+#### Control Plane
 
 The control plane manages the lifecycle of pipelines and jobs, handling all administrative operations.
 
-#### API Service
-- Exposes REST API endpoints
-- Handles authentication and authorization
-- Validates pipeline configurations
-- Manages connection profiles and tables
+**API Service**
 
-#### Pipeline Manager
-- Stores pipeline definitions
-- Validates SQL queries
-- Compiles pipelines into execution plans
-- Manages pipeline versions
+* Exposes REST API endpoints
+* Handles authentication and authorization
+* Validates pipeline configurations
+* Manages connection profiles and tables
 
-#### Job Controller
-- Schedules and deploys jobs
-- Monitors job health
-- Handles job lifecycle (start, stop, restart)
-- Manages resource allocation
+**Pipeline Manager**
 
-#### Metadata Store
-- Persists pipeline configurations
-- Stores connection information
-- Maintains job history
-- Tracks system state
+* Stores pipeline definitions
+* Validates SQL queries
+* Compiles pipelines into execution plans
+* Manages pipeline versions
 
-#### Scheduler
-- Assigns tasks to workers
-- Balances load across nodes
-- Handles worker failures
-- Manages task parallelism
+**Job Controller**
 
-#### Checkpoint Coordinator
-- Triggers periodic checkpoints
-- Coordinates distributed snapshots
-- Manages checkpoint storage
-- Handles recovery coordination
+* Schedules and deploys jobs
+* Monitors job health
+* Handles job lifecycle (start, stop, restart)
+* Manages resource allocation
 
-### Data Plane
+**Metadata Store**
+
+* Persists pipeline configurations
+* Stores connection information
+* Maintains job history
+* Tracks system state
+
+**Scheduler**
+
+* Assigns tasks to workers
+* Balances load across nodes
+* Handles worker failures
+* Manages task parallelism
+
+**Checkpoint Coordinator**
+
+* Triggers periodic checkpoints
+* Coordinates distributed snapshots
+* Manages checkpoint storage
+* Handles recovery coordination
+
+#### Data Plane
 
 The data plane executes the actual stream processing logic.
 
-#### Worker Nodes
+**Worker Nodes**
+
 Worker nodes run the distributed computation:
 
-- **Task Execution** - Run pipeline operators
-- **State Management** - Maintain operator state
-- **Data Processing** - Execute transformations
-- **Network Communication** - Exchange data between nodes
+* **Task Execution** - Run pipeline operators
+* **State Management** - Maintain operator state
+* **Data Processing** - Execute transformations
+* **Network Communication** - Exchange data between nodes
 
 Each worker node contains:
-- **Task Managers** - Execute individual tasks
-- **State Backend** - Local state storage
-- **Network Stack** - Inter-node communication
-- **Metrics Collector** - Performance monitoring
 
-### Storage Layer
+* **Task Managers** - Execute individual tasks
+* **State Backend** - Local state storage
+* **Network Stack** - Inter-node communication
+* **Metrics Collector** - Performance monitoring
 
-#### PostgreSQL (Metadata)
+#### Storage Layer
+
+**PostgreSQL (Metadata)**
+
 Stores all system metadata:
-- Pipeline definitions
-- Connection configurations
-- Job metadata
-- User information
-- System configuration
 
-#### Object Storage (State)
+* Pipeline definitions
+* Connection configurations
+* Job metadata
+* User information
+* System configuration
+
+**Object Storage (State)**
+
 Stores distributed state:
-- Checkpoints
-- Savepoints
-- Large state objects
-- Historical data
+
+* Checkpoints
+* Savepoints
+* Large state objects
+* Historical data
 
 Supported backends:
-- Amazon S3
-- Google Cloud Storage
-- Azure Blob Storage
-- MinIO
-- Local filesystem
 
-#### Prometheus (Metrics)
+* Amazon S3
+* Google Cloud Storage
+* Azure Blob Storage
+* MinIO
+* Local filesystem
+
+**Prometheus (Metrics)**
+
 Collects and stores metrics:
-- System metrics
-- Job metrics
-- Operator metrics
-- Custom metrics
 
-## Data Flow
+* System metrics
+* Job metrics
+* Operator metrics
+* Custom metrics
 
-### Pipeline Execution Flow
+### Data Flow
 
-![Pipeline Execution Flow](/img/pipeline-execution-flow.svg)
+#### Pipeline Execution Flow
 
-### Fault Tolerance
+![Pipeline Execution Flow](img/pipeline-execution-flow.svg)
+
+#### Fault Tolerance
 
 Laminar provides exactly-once processing guarantees through:
 
-#### Checkpointing
-- Periodic consistent snapshots
-- Asynchronous checkpoint barriers
-- Incremental checkpointing
-- Checkpoint alignment
+**Checkpointing**
 
-#### State Management
-- Distributed state backends
-- State versioning
-- State migration
-- State recovery
+* Periodic consistent snapshots
+* Asynchronous checkpoint barriers
+* Incremental checkpointing
+* Checkpoint alignment
 
-#### Failure Recovery
-- Automatic failure detection
-- Checkpoint-based recovery
-- Task-level restarts
-- Pipeline-level recovery
+**State Management**
 
-## Scalability
+* Distributed state backends
+* State versioning
+* State migration
+* State recovery
 
-### Horizontal Scaling
+**Failure Recovery**
+
+* Automatic failure detection
+* Checkpoint-based recovery
+* Task-level restarts
+* Pipeline-level recovery
+
+### Scalability
+
+#### Horizontal Scaling
 
 Laminar scales horizontally by:
-- Adding more worker nodes
-- Increasing task parallelism
-- Partitioning data streams
-- Distributing state
 
-### Vertical Scaling
+* Adding more worker nodes
+* Increasing task parallelism
+* Partitioning data streams
+* Distributing state
+
+#### Vertical Scaling
 
 Individual components can be scaled vertically:
-- Increase CPU cores
-- Add more memory
-- Enhance network bandwidth
-- Expand storage capacity
 
-### Auto-scaling
+* Increase CPU cores
+* Add more memory
+* Enhance network bandwidth
+* Expand storage capacity
+
+#### Auto-scaling
 
 Laminar supports auto-scaling based on:
-- CPU utilization
-- Memory usage
-- Queue depth
-- Throughput metrics
-- Custom metrics
 
+* CPU utilization
+* Memory usage
+* Queue depth
+* Throughput metrics
+* Custom metrics
 
-## Next Steps
+### Next Steps
 
-- Learn about [Configuration](./configuration) options
-- Explore [Deployment](../../deployment/overview) strategies
-- Understand [Observability](../../observability/intro) features
-- Review [Performance Tuning](./configuration#performance-tuning) guidelines
+* Learn about [Configuration](docs/concepts/configuration/) options
+* Explore [Deployment](deployment/overview/) strategies
+* Understand [Observability](observability/intro/) features
+* Review [Performance Tuning](docs/concepts/configuration/#performance-tuning) guidelines
