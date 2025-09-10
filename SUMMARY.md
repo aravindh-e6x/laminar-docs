@@ -3,7 +3,7 @@
 * [Introduction](README.md)
 * [Architecture](architecture.md)
 * [Core Concepts](concepts.md)
-* [Tutorial](tutorials/README.md)
+* [Tutorials](tutorials/README.md)
   * [Aggregates - Statistical Functions](tutorials/aggregates.md)
   * [Debezium Aggregations - CDC with Updates](tutorials/debezium_agg.md)
   * [Grouped Aggregates - Group By Statistics](tutorials/grouped_aggregates.md)
