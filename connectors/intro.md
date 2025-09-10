@@ -2,7 +2,6 @@
 sidebar_position: 1
 ---
 
-# Introduction to Connectors
 
 Laminar provides a comprehensive set of connectors for integrating with various data sources and sinks. This section covers all available connectors and their configurations.
 

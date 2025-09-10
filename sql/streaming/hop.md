@@ -3,7 +3,6 @@ title: HOP Window
 description: Sliding windows with configurable overlap for streaming aggregations
 ---
 
-# HOP Window Function
 
 ## Description
 

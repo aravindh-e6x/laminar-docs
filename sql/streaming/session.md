@@ -3,7 +3,6 @@ title: SESSION Window
 description: Dynamic gap-based windows for user activity and session analysis
 ---
 
-# SESSION Window Function
 
 ## Description
 

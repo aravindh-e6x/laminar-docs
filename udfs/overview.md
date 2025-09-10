@@ -3,7 +3,6 @@ title: UDF Overview
 sidebar_position: 1
 ---
 
-# User-Defined Functions (UDFs)
 
 User-Defined Functions (UDFs) allow you to extend Laminar's SQL capabilities with custom Rust functions. UDFs are compiled to native code and run efficiently within your streaming pipelines.
 

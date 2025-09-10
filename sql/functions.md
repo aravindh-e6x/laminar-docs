@@ -2,7 +2,6 @@
 sidebar_position: 2
 ---
 
-# SQL Functions
 
 Laminar provides a comprehensive set of SQL functions for data manipulation and analysis. This section documents all available functions organized by category.
 

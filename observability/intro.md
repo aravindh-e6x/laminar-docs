@@ -2,7 +2,6 @@
 sidebar_position: 1
 ---
 
-# Observability Introduction
 
 Comprehensive observability is crucial for operating Laminar in production. This section covers metrics, logging, tracing, and alerting.
 
@@ -59,7 +58,6 @@ Laminar provides built-in observability features based on the three pillars:
 ### Enable Metrics Collection
 
 ```yaml
-# config.yaml
 observability:
   metrics:
     enabled: true
@@ -131,7 +129,6 @@ Laminar includes pre-built dashboards for:
 ### Prometheus
 
 ```yaml
-# prometheus.yml
 scrape_configs:
   - job_name: 'laminar'
     static_configs:
@@ -156,7 +153,6 @@ scrape_configs:
 ### Jaeger
 
 ```yaml
-# docker-compose.yml
 services:
   jaeger:
     image: jaegertracing/all-in-one:latest

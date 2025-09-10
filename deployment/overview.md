@@ -3,7 +3,6 @@ sidebar_position: 2
 title: Deployment Overview
 ---
 
-# Deployment Overview
 
 Laminar is designed for distributed, production-grade deployments that can scale horizontally to handle millions of events per second. This guide covers the various deployment options and key considerations for running Laminar in production.
 
@@ -109,13 +108,10 @@ Centralized storage is required for checkpoints and artifacts. All nodes in the 
 Configure storage locations using environment variables:
 
 ```bash
-# Checkpoint storage for pipeline state
 LAMINAR_CHECKPOINT_URL=s3://laminar-checkpoints/prod
 
-# Artifact storage for compiled pipelines
 LAMINAR_ARTIFACT_URL=s3://laminar-artifacts/prod
 
-# Custom S3 endpoint (for MinIO or other S3-compatible storage)
 LAMINAR_S3_ENDPOINT=https://minio.example.com
 LAMINAR_S3_REGION=us-east-1
 ```

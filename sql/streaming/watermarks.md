@@ -3,7 +3,6 @@ title: Watermarks
 description: Managing event time and handling late data in streaming queries
 ---
 
-# Watermarks in Streaming SQL
 
 ## Overview
 

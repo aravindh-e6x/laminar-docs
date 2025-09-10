@@ -3,7 +3,6 @@ sidebar_position: 6
 title: Jobs
 ---
 
-# Jobs API
 
 The Jobs API provides endpoints for monitoring and managing pipeline executions. A job represents a running instance of a pipeline and tracks its execution state, metrics, and output.
 
@@ -92,10 +91,8 @@ GET /api/v1/jobs
 #### Example
 
 ```bash
-# Get all running jobs
 curl "http://localhost:5115/api/v1/jobs?running=true"
 
-# Get failed jobs
 curl "http://localhost:5115/api/v1/jobs?state=Failed"
 ```
 
@@ -495,29 +492,3 @@ GET /api/v1/jobs/{job_id}/logs
   ]
 }
 ```
-
-## Error Codes
-
-Job-specific error codes:
-
-| Code | Description |
-|------|-------------|
-| `JOB_NOT_FOUND` | Job doesn't exist |
-| `JOB_NOT_RUNNING` | Job is not running |
-| `JOB_ALREADY_RUNNING` | Job is already running |
-| `CHECKPOINT_NOT_FOUND` | Checkpoint doesn't exist |
-| `INVALID_STATE_TRANSITION` | Invalid state change |
-| `OPERATOR_NOT_FOUND` | Operator doesn't exist |
-
-## Best Practices
-
-1. **Monitor job states** regularly
-2. **Check metrics** for performance issues
-3. **Review error logs** for failures
-4. **Use checkpoints** for recovery
-5. **Set appropriate parallelism** for workload
-6. **Handle backpressure** properly
-7. **Archive old job data** periodically
-8. **Set up alerts** for job failures
-9. **Test recovery procedures** regularly
-10. **Document job configurations** thoroughly

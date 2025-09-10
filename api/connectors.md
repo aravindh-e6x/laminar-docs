@@ -3,7 +3,6 @@ sidebar_position: 4
 title: Connectors
 ---
 
-# Connectors API
 
 The Connectors API provides information about available data source and sink connectors in Laminar. This endpoint helps you discover supported connectors and their configurations.
 
@@ -638,6 +637,8 @@ Each connector provides a JSON Schema that describes its configuration requireme
 curl http://localhost:5115/api/v1/connectors
 ```
 
+Note: This endpoint does not require authentication.
+
 ### Filter by Category
 
 ```bash
@@ -655,14 +656,11 @@ curl "http://localhost:5115/api/v1/connectors?type=source"
 ```python
 import requests
 
-# Get all connectors
 response = requests.get("http://localhost:5115/api/v1/connectors")
 connectors = response.json()["data"]
 
-# Find Kafka connector
 kafka = next(c for c in connectors if c["id"] == "kafka")
 
-# Get configuration schema
 source_schema = kafka["configuration_schema"]["source"]
 required_fields = source_schema["required"]
 properties = source_schema["properties"]

@@ -3,7 +3,6 @@ title: UDF Examples
 sidebar_position: 4
 ---
 
-# UDF Examples
 
 Real-world examples of UDFs for common streaming data processing tasks.
 

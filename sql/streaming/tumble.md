@@ -3,7 +3,6 @@ title: TUMBLE Window
 description: Fixed-size, non-overlapping time windows for streaming aggregations
 ---
 
-# TUMBLE Window Function
 
 ## Description
 

@@ -3,7 +3,6 @@ title: UDF Types
 sidebar_position: 3
 ---
 
-# UDF Type Reference
 
 This page provides a comprehensive reference for all UDF types and their usage patterns.
 

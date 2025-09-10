@@ -3,7 +3,6 @@ sidebar_position: 2
 title: Metrics Reference
 ---
 
-# Metrics Reference
 
 Laminar exposes comprehensive metrics in Prometheus format, providing deep visibility into pipeline performance, resource utilization, and system health. All metrics are available at the `/metrics` endpoint on port 9090 by default.
 
@@ -36,10 +35,8 @@ Count of messages received by each subtask.
 
 **Example:**
 ```promql
-# Messages per second by operator
 rate(laminar_messages_recv[1m])
 
-# Total messages received by pipeline
 sum(laminar_messages_recv) by (job_id)
 ```
 
@@ -61,7 +58,6 @@ Total bytes received by each subtask.
 
 **Example:**
 ```promql
-# Throughput in MB/s
 rate(laminar_bytes_recv[1m]) / 1024 / 1024
 ```
 
@@ -102,10 +98,8 @@ Count of deserialization errors encountered.
 
 **Example:**
 ```promql
-# Error rate per operator
 rate(laminar_deserialization_errors[5m])
 
-# Alert on high error rate
 laminar_deserialization_errors > 100
 ```
 
@@ -123,10 +117,8 @@ Current size of transmission queues between operators.
 
 **Example:**
 ```promql
-# Average queue size
 avg(laminar_worker_tx_queue_size) by (operator_name)
 
-# Queue backup detection
 laminar_worker_tx_queue_size > 1000
 ```
 
@@ -159,10 +151,8 @@ Number of workers currently managed by each node.
 
 **Example:**
 ```promql
-# Total workers in cluster
 sum(laminar_node_running_workers)
 
-# Workers per node
 laminar_node_running_workers
 ```
 
@@ -302,10 +292,8 @@ Current watermark value for each operator.
 
 **Example:**
 ```promql
-# Watermark lag (current time - watermark)
 time() - laminar_watermark
 
-# Watermark skew between subtasks
 max(laminar_watermark) by (operator_name) - min(laminar_watermark) by (operator_name)
 ```
 
@@ -336,34 +324,26 @@ These appear as:
 
 #### Pipeline Health
 ```promql
-# Overall pipeline throughput
 sum(rate(laminar_messages_sent[5m])) by (pipeline_id)
 
-# Error rate percentage
 100 * sum(rate(laminar_deserialization_errors[5m])) / sum(rate(laminar_messages_recv[5m]))
 
-# Average processing latency
 histogram_quantile(0.95, laminar_processing_latency_seconds)
 ```
 
 #### Resource Utilization
 ```promql
-# CPU usage by pipeline
 sum(laminar_cpu_usage_percent) by (pipeline_id)
 
-# Memory usage trends
 laminar_memory_usage_bytes / 1024 / 1024 / 1024  # GB
 
-# Queue saturation
 1 - (laminar_worker_tx_queue_rem / (laminar_worker_tx_queue_rem + laminar_worker_tx_queue_size))
 ```
 
 #### Backpressure Detection
 ```promql
-# High queue usage
 laminar_worker_tx_queue_size / (laminar_worker_tx_queue_size + laminar_worker_tx_queue_rem) > 0.8
 
-# Slow operators (high input rate, low output rate)
 rate(laminar_messages_recv[1m]) - rate(laminar_messages_sent[1m]) > 100
 ```
 
@@ -430,17 +410,14 @@ Key panels include:
 Metrics can be exported to various backends:
 
 ```yaml
-# Prometheus remote write
 metrics:
   export:
     - type: prometheus_remote_write
       endpoint: https://prometheus.example.com/api/v1/write
       
-# Datadog
     - type: datadog
       api_key: ${DATADOG_API_KEY}
       
-# CloudWatch
     - type: cloudwatch
       region: us-east-1
       namespace: Laminar/Production

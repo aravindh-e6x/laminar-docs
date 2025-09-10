@@ -2,7 +2,6 @@
 sidebar_position: 1
 ---
 
-# Deployment Introduction
 
 This section covers everything you need to know about deploying Laminar in production environments.
 
@@ -85,21 +84,17 @@ Essential security measures:
 ### Local Development
 
 ```bash
-# Using Docker Compose
 docker-compose up -d
 
-# Verify deployment
 laminar status
 ```
 
 ### Kubernetes
 
 ```bash
-# Using Helm
 helm repo add laminar https://charts.laminar.dev
 helm install laminar laminar/laminar
 
-# Verify deployment
 kubectl get pods -n laminar
 ```
 

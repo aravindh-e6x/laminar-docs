@@ -3,7 +3,6 @@ sidebar_position: 4
 title: Kubernetes
 ---
 
-# Kubernetes Deployment
 
 Kubernetes is the recommended deployment method for running Laminar in production. This guide covers deploying Laminar on Kubernetes using Helm, including configuration for various cloud providers and production best practices.
 
@@ -27,38 +26,30 @@ Kubernetes is the recommended deployment method for running Laminar in productio
 ### 1. Add Helm Repository
 
 ```bash
-# Add Laminar Helm repository
 helm repo add laminar https://charts.laminar.dev
 helm repo update
 
-# Search for available charts
 helm search repo laminar
 ```
 
 ### 2. Basic Installation
 
 ```bash
-# Install with default values
 helm install laminar laminar/laminar
 
-# Install in specific namespace
 kubectl create namespace laminar
 helm install laminar laminar/laminar -n laminar
 
-# Install with custom release name
 helm install my-streaming laminar/laminar
 ```
 
 ### 3. Verify Installation
 
 ```bash
-# Check pod status
 kubectl get pods -n laminar
 
-# Check services
 kubectl get svc -n laminar
 
-# Check deployment status
 helm status laminar -n laminar
 ```
 
@@ -69,7 +60,6 @@ helm status laminar -n laminar
 Create a `values.yaml` file for your configuration:
 
 ```yaml
-# values.yaml
 global:
   # Cluster name for identification
   clusterName: production
@@ -92,7 +82,6 @@ global:
     existingSecret: laminar-db-secret
     secretKey: password
 
-# API Server configuration
 apiServer:
   replicas: 3
   resources:
@@ -103,7 +92,6 @@ apiServer:
       cpu: 4
       memory: 8Gi
 
-# Worker configuration
 worker:
   replicas: 5
   resources:
@@ -114,7 +102,6 @@ worker:
       cpu: 8
       memory: 32Gi
 
-# Web UI configuration
 webui:
   enabled: true
   ingress:
@@ -125,7 +112,6 @@ webui:
       enabled: true
       secretName: laminar-tls
 
-# Monitoring
 prometheus:
   enabled: true
   serviceMonitor:
@@ -144,7 +130,6 @@ helm install laminar laminar/laminar -f values.yaml -n laminar
 Configuration for AWS EKS deployment:
 
 ```yaml
-# eks-values.yaml
 global:
   cloud:
     provider: aws
@@ -162,13 +147,11 @@ global:
       # Use IRSA for authentication
       useIRSA: true
 
-# Service account with IRSA
 serviceAccount:
   create: true
   annotations:
     eks.amazonaws.com/role-arn: arn:aws:iam::123456789:role/laminar-role
 
-# Use RDS for database
 postgresql:
   enabled: false
   
@@ -180,7 +163,6 @@ database:
   username: laminar
   existingSecret: rds-secret
 
-# Node selectors for different node groups
 apiServer:
   nodeSelector:
     node-group: control-plane
@@ -200,7 +182,6 @@ worker:
       value: "true"
       effect: NoSchedule
 
-# ALB Ingress Controller
 ingress:
   enabled: true
   className: alb
@@ -212,10 +193,8 @@ ingress:
 
 Deploy on EKS:
 ```bash
-# Create namespace
 kubectl create namespace laminar
 
-# Create IRSA
 eksctl create iamserviceaccount \
   --cluster=my-cluster \
   --namespace=laminar \
@@ -223,7 +202,6 @@ eksctl create iamserviceaccount \
   --attach-policy-arn=arn:aws:iam::123456789:policy/LaminarPolicy \
   --approve
 
-# Install Laminar
 helm install laminar laminar/laminar -f eks-values.yaml -n laminar
 ```
 
@@ -232,7 +210,6 @@ helm install laminar laminar/laminar -f eks-values.yaml -n laminar
 Configuration for Google GKE deployment:
 
 ```yaml
-# gke-values.yaml
 global:
   cloud:
     provider: gcp
@@ -251,13 +228,11 @@ global:
       # Use Workload Identity
       useWorkloadIdentity: true
 
-# Service account with Workload Identity
 serviceAccount:
   create: true
   annotations:
     iam.gke.io/gcp-service-account: laminar@my-project.iam.gserviceaccount.com
 
-# Use Cloud SQL
 postgresql:
   enabled: false
   
@@ -272,7 +247,6 @@ database:
     enabled: true
     instanceConnectionName: my-project:us-central1:laminar-db
 
-# Use GKE Autopilot
 resources:
   apiServer:
     requests:
@@ -290,7 +264,6 @@ resources:
       cpu: 4
       memory: 16Gi
 
-# GKE Ingress
 ingress:
   enabled: true
   className: gce
@@ -301,15 +274,12 @@ ingress:
 
 Deploy on GKE:
 ```bash
-# Create namespace
 kubectl create namespace laminar
 
-# Setup Workload Identity
 kubectl annotate serviceaccount laminar \
   -n laminar \
   iam.gke.io/gcp-service-account=laminar@my-project.iam.gserviceaccount.com
 
-# Install Laminar
 helm install laminar laminar/laminar -f gke-values.yaml -n laminar
 ```
 
@@ -318,7 +288,6 @@ helm install laminar laminar/laminar -f gke-values.yaml -n laminar
 Configuration for Azure AKS deployment:
 
 ```yaml
-# aks-values.yaml
 global:
   cloud:
     provider: azure
@@ -337,13 +306,11 @@ global:
       # Use Managed Identity
       useManagedIdentity: true
 
-# Pod Identity configuration
 podIdentity:
   enabled: true
   identityName: laminar-identity
   identityClientId: 12345678-1234-1234-1234-123456789abc
 
-# Use Azure Database for PostgreSQL
 postgresql:
   enabled: false
   
@@ -356,12 +323,10 @@ database:
   sslMode: require
   existingSecret: postgres-secret
 
-# Azure disk storage classes
 persistence:
   storageClass: managed-csi-premium
   size: 100Gi
 
-# Application Gateway Ingress Controller
 ingress:
   enabled: true
   className: azure/application-gateway
@@ -377,12 +342,9 @@ ingress:
 Configure Laminar for high availability:
 
 ```yaml
-# ha-values.yaml
-# Enable HA mode
 highAvailability:
   enabled: true
 
-# API Server HA
 apiServer:
   replicas: 3
   affinity:
@@ -396,12 +358,10 @@ apiServer:
             - api-server
         topologyKey: kubernetes.io/hostname
 
-# Job Manager HA
 jobManager:
   replicas: 3
   enableLeaderElection: true
 
-# Database HA (external)
 database:
   type: postgres
   hosts:
@@ -421,7 +381,6 @@ database:
 Configure horizontal pod autoscaling:
 
 ```yaml
-# autoscaling-values.yaml
 autoscaling:
   enabled: true
   
@@ -464,8 +423,6 @@ autoscaling:
 Security-hardened configuration:
 
 ```yaml
-# security-values.yaml
-# Pod Security Context
 podSecurityContext:
   runAsNonRoot: true
   runAsUser: 1000
@@ -473,7 +430,6 @@ podSecurityContext:
   seccompProfile:
     type: RuntimeDefault
 
-# Container Security Context
 securityContext:
   allowPrivilegeEscalation: false
   capabilities:
@@ -481,7 +437,6 @@ securityContext:
     - ALL
   readOnlyRootFilesystem: true
 
-# Network Policies
 networkPolicy:
   enabled: true
   ingress:
@@ -504,7 +459,6 @@ networkPolicy:
       - port: 53
         protocol: UDP
 
-# TLS Configuration
 tls:
   enabled: true
   # Internal TLS
@@ -518,7 +472,6 @@ tls:
     certManager: true
     issuer: letsencrypt-prod
 
-# Secrets management
 secrets:
   provider: kubernetes  # or vault, aws-secrets-manager, etc.
   vault:
@@ -533,7 +486,6 @@ secrets:
 ### Prometheus Integration
 
 ```yaml
-# monitoring-values.yaml
 metrics:
   enabled: true
   serviceMonitor:
@@ -544,7 +496,6 @@ metrics:
     interval: 30s
     scrapeTimeout: 10s
 
-# Grafana dashboards
 grafana:
   enabled: true
   dashboards:
@@ -556,7 +507,6 @@ grafana:
 ### Logging
 
 ```yaml
-# logging-values.yaml
 logging:
   enabled: true
   level: INFO
@@ -590,39 +540,31 @@ logging:
 ### Upgrading Laminar
 
 ```bash
-# Update Helm repository
 helm repo update
 
-# Check available versions
 helm search repo laminar --versions
 
-# Dry run upgrade
 helm upgrade laminar laminar/laminar \
   -f values.yaml \
   -n laminar \
   --dry-run
 
-# Perform upgrade
 helm upgrade laminar laminar/laminar \
   -f values.yaml \
   -n laminar \
   --wait \
   --timeout 10m
 
-# Verify upgrade
 kubectl rollout status deployment/laminar-api-server -n laminar
 ```
 
 ### Rolling Back
 
 ```bash
-# Check release history
 helm history laminar -n laminar
 
-# Rollback to previous version
 helm rollback laminar -n laminar
 
-# Rollback to specific revision
 helm rollback laminar 3 -n laminar
 ```
 
@@ -632,24 +574,19 @@ helm rollback laminar 3 -n laminar
 
 **Pods Not Starting**
 ```bash
-# Check pod status
 kubectl get pods -n laminar
 kubectl describe pod <pod-name> -n laminar
 
-# Check logs
 kubectl logs <pod-name> -n laminar
 kubectl logs <pod-name> -n laminar --previous
 ```
 
 **Storage Access Issues**
 ```bash
-# Check service account
 kubectl get sa laminar -n laminar -o yaml
 
-# Check RBAC
 kubectl auth can-i get pods --as=system:serviceaccount:laminar:laminar
 
-# Test storage access
 kubectl run test-storage --rm -it \
   --image=laminar/laminar:latest \
   --serviceaccount=laminar \
@@ -658,12 +595,10 @@ kubectl run test-storage --rm -it \
 
 **Database Connection Issues**
 ```bash
-# Test database connection
 kubectl run test-db --rm -it \
   --image=postgres:14 \
   -- psql -h postgres.example.com -U laminar -d laminar
 
-# Check secrets
 kubectl get secret laminar-db-secret -n laminar -o yaml
 ```
 

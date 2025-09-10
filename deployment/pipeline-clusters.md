@@ -3,7 +3,6 @@ sidebar_position: 3
 title: Pipeline Clusters
 ---
 
-# Pipeline Clusters
 
 Pipeline clusters provide a lightweight, self-contained way to run individual Laminar pipelines. This deployment mode is ideal for development, testing, CI/CD pipelines, and serverless platforms.
 
@@ -43,19 +42,14 @@ A pipeline cluster is a minimal Laminar deployment that:
 The `laminar run` command creates and manages pipeline clusters:
 
 ```bash
-# Run a pipeline from a SQL file
 laminar run --sql-file pipeline.sql --name my-pipeline
 
-# Run with custom parallelism
 laminar run --sql-file pipeline.sql --parallelism 4
 
-# Run with state directory
 laminar run --sql-file pipeline.sql --state-dir /data/checkpoints
 
-# Run from stdin
 echo "INSERT INTO output SELECT * FROM input" | laminar run
 
-# Run from environment variable
 export LAMINAR_SQL="INSERT INTO output SELECT * FROM input"
 laminar run --sql-env LAMINAR_SQL
 ```
@@ -108,19 +102,15 @@ laminar run --config pipeline.yaml
 Configure pipeline clusters using environment variables:
 
 ```bash
-# Core settings
 export LAMINAR_PIPELINE_NAME=my-pipeline
 export LAMINAR_PARALLELISM=4
 
-# Checkpoint configuration
 export LAMINAR_CHECKPOINT_URL=s3://my-bucket/checkpoints
 export LAMINAR_CHECKPOINT_INTERVAL=30000
 
-# Database configuration
 export LAMINAR_DATABASE_TYPE=sqlite
 export LAMINAR_DATABASE_PATH=/data/laminar.db
 
-# Storage configuration
 export LAMINAR_ARTIFACT_URL=s3://my-bucket/artifacts
 export LAMINAR_S3_ENDPOINT=https://s3.amazonaws.com
 export AWS_ACCESS_KEY_ID=your-key
@@ -150,13 +140,10 @@ checkpoint:
 Resume a pipeline from the last checkpoint:
 
 ```bash
-# List available checkpoints
 laminar checkpoint list --pipeline my-pipeline
 
-# Restore from specific checkpoint
 laminar run --restore-from checkpoint-123 --sql-file pipeline.sql
 
-# Restore from latest checkpoint
 laminar run --restore-latest --sql-file pipeline.sql
 ```
 
@@ -341,10 +328,8 @@ GROUP BY DATE_TRUNC('hour', order_time);
 Pipeline clusters expose metrics on port 9090:
 
 ```bash
-# Enable metrics
 laminar run --metrics-port 9090 --sql-file pipeline.sql
 
-# Prometheus scrape configuration
 scrape_configs:
   - job_name: 'laminar-pipeline'
     static_configs:
@@ -356,13 +341,10 @@ scrape_configs:
 Configure logging levels and outputs:
 
 ```bash
-# Set log level
 export RUST_LOG=info,laminar=debug
 
-# JSON logging
 export LAMINAR_LOG_FORMAT=json
 
-# Log to file
 laminar run --log-file /var/log/pipeline.log --sql-file pipeline.sql
 ```
 
@@ -371,13 +353,10 @@ laminar run --log-file /var/log/pipeline.log --sql-file pipeline.sql
 Pipeline clusters provide health endpoints:
 
 ```bash
-# Liveness probe
 curl http://localhost:8080/health/live
 
-# Readiness probe
 curl http://localhost:8080/health/ready
 
-# Metrics
 curl http://localhost:9090/metrics
 ```
 
@@ -409,29 +388,23 @@ curl http://localhost:9090/metrics
 
 **Pipeline Won't Start**
 ```bash
-# Check configuration
 laminar run --validate --sql-file pipeline.sql
 
-# Increase log verbosity
 export RUST_LOG=debug
 laminar run --sql-file pipeline.sql
 ```
 
 **Checkpoint Failures**
 ```bash
-# Test storage access
 laminar storage test --url s3://my-bucket/test
 
-# Check permissions
 aws s3 ls s3://my-bucket/checkpoints/
 ```
 
 **Performance Issues**
 ```bash
-# Increase parallelism
 laminar run --parallelism 8 --sql-file pipeline.sql
 
-# Profile pipeline
 laminar run --profile --sql-file pipeline.sql
 ```
 

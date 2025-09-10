@@ -3,7 +3,6 @@ title: Schema Registry
 sidebar_position: 3
 ---
 
-# Schema Registry
 
 Schema Registry provides centralized schema management for your streaming data, ensuring data compatibility and enabling schema evolution across your pipelines.
 

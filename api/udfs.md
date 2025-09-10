@@ -3,7 +3,6 @@ sidebar_position: 7
 title: UDFs
 ---
 
-# User-Defined Functions (UDFs) API
 
 User-Defined Functions (UDFs) allow you to extend Laminar's SQL capabilities with custom logic written in Rust. UDFs can be used in SQL queries for custom transformations, aggregations, and computations.
 

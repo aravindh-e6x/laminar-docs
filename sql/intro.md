@@ -1,88 +1,45 @@
 ---
 sidebar_position: 1
+title: SQL Overview
 ---
 
-# SQL Reference Introduction
+# SQL Reference
 
-Laminar uses SQL as its primary language for defining data pipelines and transformations. This section provides a comprehensive reference for Laminar's SQL dialect.
+Laminar uses SQL as its primary language for defining data pipelines and transformations. Under the hood, Laminar uses [Apache DataFusion](https://arrow.apache.org/datafusion/) as its SQL engine, extending it with streaming-specific semantics.
 
-## Overview
+## DataFusion Foundation
 
-Laminar SQL extends standard SQL with streaming-specific constructs:
+Laminar is built on Apache DataFusion, which provides:
 
-- **Continuous queries** that run indefinitely on streaming data
+- **ANSI SQL compliance** with extensive SQL function support
+- **Columnar execution** using Apache Arrow format
+- **Query optimization** with cost-based optimizer
+- **Extensibility** through user-defined functions
+
+For detailed information about SQL functions, operators, and syntax, refer to the [DataFusion SQL Reference](https://arrow.apache.org/datafusion/user-guide/sql/index.html).
+
+## Streaming Extensions
+
+While DataFusion handles the core SQL processing, Laminar wraps it with streaming-specific semantics:
+
+### Streaming Concepts
+
+- **Continuous queries** that run indefinitely on unbounded data streams
 - **Window functions** for time-based and count-based aggregations
-- **Watermarks** for handling late-arriving data
-- **Joins** between streams and tables
+- **Watermarks** for handling late-arriving data and controlling result emission
+- **Stream-table joins** with temporal alignment
 
-## SQL Compatibility
+For detailed information about these streaming features, see:
 
-Laminar SQL is based on Apache Calcite and supports:
-
-- ANSI SQL standard syntax
-- Common SQL functions and operators
-- Complex data types (arrays, structs, maps)
-- User-defined functions (UDFs)
-
-## Key Concepts
-
-### Streams vs Tables
-
-In Laminar, data can be represented as:
-
-- **Streams**: Unbounded sequences of events
-- **Tables**: Bounded datasets or materialized views
-- **Updating Tables**: Tables that change over time
-
-### Time Semantics
-
-Laminar supports two time semantics:
-
-- **Event Time**: Time when the event occurred
-- **Processing Time**: Time when the event is processed
-
-### Windows
-
-Windows divide infinite streams into finite chunks:
-
-- **Tumbling Windows**: Fixed-size, non-overlapping
-- **Sliding Windows**: Fixed-size, overlapping
-- **Session Windows**: Variable-size, gap-based
-
-## Basic Syntax
-
-### Creating a Pipeline
-
-```sql
-CREATE PIPELINE my_pipeline AS
-SELECT 
-    user_id,
-    COUNT(*) as event_count,
-    window_start,
-    window_end
-FROM events
-GROUP BY 
-    user_id,
-    TUMBLE(event_time, INTERVAL '1' HOUR);
-```
-
-### Creating a Table
-
-```sql
-CREATE TABLE users (
-    user_id BIGINT,
-    username VARCHAR,
-    created_at TIMESTAMP,
-    PRIMARY KEY (user_id)
-) WITH (
-    connector = 'postgres',
-    connection = 'my_postgres'
-);
-```
+- [Streaming Overview](./streaming/overview) - Core streaming concepts
+- [Tumble Windows](./streaming/tumble) - Fixed-size, non-overlapping windows
+- [Hop Windows](./streaming/hop) - Fixed-size, overlapping windows  
+- [Session Windows](./streaming/session) - Variable-size, activity-based windows
+- [Watermarks](./streaming/watermarks) - Late data handling
 
 ## Next Steps
 
-- [SELECT Statements](./select) - Query syntax and operators
-- [Window Functions](./windows) - Time-based aggregations
-- [Joins](./joins) - Joining streams and tables
-- [Data Types](./types/primitive) - Supported data types
+- Explore [Streaming SQL](./streaming/overview) for streaming-specific features
+- Learn about [Window Functions](./streaming/tumble) for time-based aggregations
+- Check [DataFusion Documentation](https://arrow.apache.org/datafusion/) for function reference
+- See [Tutorials](/docs/tutorials/introduction) for practical examples

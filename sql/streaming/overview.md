@@ -3,7 +3,6 @@ title: Streaming SQL Overview
 description: Introduction to streaming SQL concepts and capabilities in Laminar
 ---
 
-# Streaming SQL Overview
 
 ## Introduction
 

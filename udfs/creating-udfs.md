@@ -3,7 +3,6 @@ title: Creating UDFs
 sidebar_position: 2
 ---
 
-# Creating User-Defined Functions
 
 This guide walks you through creating and deploying UDFs in Laminar.
 

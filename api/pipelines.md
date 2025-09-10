@@ -3,7 +3,6 @@ sidebar_position: 5
 title: Pipelines
 ---
 
-# Pipeline Management API
 
 The Pipeline API allows you to create, manage, and monitor streaming pipelines in Laminar. Pipelines define the data processing logic using SQL queries and can be configured with various execution parameters.
 
@@ -145,10 +144,8 @@ GET /api/v1/pipelines
 #### Example
 
 ```bash
-# Get all running pipelines
 curl "http://localhost:5115/api/v1/pipelines?state=running"
 
-# Paginate through pipelines
 curl "http://localhost:5115/api/v1/pipelines?limit=10&offset=20"
 ```
 
@@ -228,12 +225,10 @@ Returns the updated pipeline object.
 #### Example
 
 ```bash
-# Update parallelism
 curl -X PATCH http://localhost:5115/api/v1/pipelines/pipe_1234567890 \
   -H "Content-Type: application/json" \
   -d '{"parallelism": 8}'
 
-# Stop pipeline with checkpoint
 curl -X PATCH http://localhost:5115/api/v1/pipelines/pipe_1234567890 \
   -H "Content-Type: application/json" \
   -d '{"stop": "checkpoint"}'
@@ -309,6 +304,7 @@ POST /api/v1/pipelines/{pipeline_id}/restart
 ```bash
 curl -X POST http://localhost:5115/api/v1/pipelines/pipe_1234567890/restart \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
   -d '{"force": false}'
 ```
 
@@ -486,28 +482,3 @@ Pipelines can be in the following states:
 | `Failed` | Pipeline failed due to an error |
 | `Finished` | Pipeline completed successfully |
 
-## Error Codes
-
-Pipeline-specific error codes:
-
-| Code | Description |
-|------|-------------|
-| `INVALID_QUERY` | SQL query syntax error |
-| `TABLE_NOT_FOUND` | Referenced table doesn't exist |
-| `DUPLICATE_NAME` | Pipeline name already exists |
-| `INVALID_PARALLELISM` | Parallelism value out of range |
-| `PIPELINE_RUNNING` | Cannot modify running pipeline |
-| `PIPELINE_NOT_FOUND` | Pipeline doesn't exist |
-
-## Best Practices
-
-1. **Validate queries** before creating pipelines
-2. **Use appropriate parallelism** based on data volume
-3. **Set checkpoint intervals** based on recovery requirements
-4. **Monitor pipeline state** regularly
-5. **Use preview pipelines** for testing
-6. **Handle state transitions** properly
-7. **Clean up stopped pipelines** to free resources
-8. **Use meaningful names** for pipelines
-9. **Document complex queries** with comments
-10. **Test with small data** before production deployment
